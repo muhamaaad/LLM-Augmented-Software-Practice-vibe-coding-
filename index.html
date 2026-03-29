@@ -40,10 +40,12 @@
       gap: 8px;
       padding: 16px;
       border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap;
     }
 
-    .input-area input {
+    .input-area input[type="text"] {
       flex: 1;
+      min-width: 140px;
       padding: 10px 14px;
       border: 1px solid #d1d5db;
       border-radius: 8px;
@@ -52,7 +54,18 @@
       transition: border-color 0.2s;
     }
 
-    .input-area input:focus { border-color: #4f46e5; }
+    .input-area input[type="text"]:focus { border-color: #4f46e5; }
+
+    .priority-select {
+      padding: 10px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+      background: white;
+      color: #374151;
+    }
 
     .input-area button {
       padding: 10px 18px;
@@ -72,6 +85,7 @@
       gap: 4px;
       padding: 12px 16px;
       border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap;
     }
 
     .filters button {
@@ -99,10 +113,15 @@
       gap: 12px;
       padding: 14px 16px;
       border-bottom: 1px solid #f3f4f6;
+      border-left: 4px solid transparent;
       transition: background 0.15s;
     }
 
     .todo-item:hover { background: #f9fafb; }
+
+    .todo-item.priority-high   { border-left-color: #ef4444; }
+    .todo-item.priority-medium { border-left-color: #f59e0b; }
+    .todo-item.priority-low    { border-left-color: #22c55e; }
 
     .todo-item input[type="checkbox"] {
       width: 18px;
@@ -112,17 +131,36 @@
       flex-shrink: 0;
     }
 
-    .todo-item span {
+    .todo-item .text-wrap {
       flex: 1;
+      min-width: 0;
+    }
+
+    .todo-item .task-text {
       font-size: 0.95rem;
       color: #111827;
       word-break: break-word;
     }
 
-    .todo-item span.done {
+    .todo-item .task-text.done {
       text-decoration: line-through;
       color: #9ca3af;
     }
+
+    .priority-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-top: 4px;
+    }
+
+    .badge-high   { background: #fee2e2; color: #b91c1c; }
+    .badge-medium { background: #fef3c7; color: #b45309; }
+    .badge-low    { background: #dcfce7; color: #15803d; }
 
     .todo-item .delete-btn {
       background: none;
@@ -175,6 +213,11 @@
 
     <div class="input-area">
       <input type="text" id="new-todo" placeholder="Add a new task..." maxlength="200">
+      <select class="priority-select" id="priority-select">
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+        <option value="low">Low</option>
+      </select>
       <button onclick="addTodo()">Add</button>
     </div>
 
@@ -182,6 +225,9 @@
       <button class="active" onclick="setFilter('all', this)">All</button>
       <button onclick="setFilter('active', this)">Active</button>
       <button onclick="setFilter('done', this)">Done</button>
+      <button onclick="setFilter('high', this)">High</button>
+      <button onclick="setFilter('medium', this)">Medium</button>
+      <button onclick="setFilter('low', this)">Low</button>
     </div>
 
     <ul class="todo-list" id="todo-list"></ul>
@@ -206,16 +252,20 @@
       const list = document.getElementById('todo-list');
       const empty = document.getElementById('empty-msg');
 
-      const visible = todos.filter(t =>
-        filter === 'all' ? true :
-        filter === 'active' ? !t.done :
-        t.done
-      );
+      const visible = todos.filter(t => {
+        if (filter === 'all') return true;
+        if (filter === 'active') return !t.done;
+        if (filter === 'done') return t.done;
+        return t.priority === filter;
+      });
 
       list.innerHTML = visible.map(t => `
-        <li class="todo-item">
+        <li class="todo-item priority-${t.priority || 'medium'}">
           <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggle(${t.id})">
-          <span class="${t.done ? 'done' : ''}">${escape(t.text)}</span>
+          <div class="text-wrap">
+            <div class="task-text ${t.done ? 'done' : ''}">${escape(t.text)}</div>
+            <span class="priority-badge badge-${t.priority || 'medium'}">${t.priority || 'medium'}</span>
+          </div>
           <button class="delete-btn" onclick="remove(${t.id})" title="Delete">&#10005;</button>
         </li>
       `).join('');
@@ -235,9 +285,10 @@
 
     function addTodo() {
       const input = document.getElementById('new-todo');
+      const priority = document.getElementById('priority-select').value;
       const text = input.value.trim();
       if (!text) return;
-      todos.push({ id: Date.now(), text, done: false });
+      todos.push({ id: Date.now(), text, done: false, priority });
       input.value = '';
       save();
       render();
