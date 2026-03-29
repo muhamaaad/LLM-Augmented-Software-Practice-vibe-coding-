@@ -1,0 +1,298 @@
+================================================================
+        TODO APP — COMPLETE PROJECT SPECIFICATION
+        Course Assignment | Single-User | Frontend Only
+================================================================
+
+----------------------------------------------------------------
+1. CORE FEATURES & OTHER FEATURES
+----------------------------------------------------------------
+
+CORE FEATURES (must have):
+  - Add a task with a title
+  - Set priority: High / Medium / Low (color-coded)
+  - Set a due date for each task
+  - Mark task as complete / incomplete (checkbox)
+  - Delete a task
+  - Edit a task title inline (double-click to edit)
+  - Filter tasks: All / Active / Done / High / Medium / Low
+  - Search tasks by keyword (live search bar)
+  - Persist all data in localStorage (survives page refresh)
+
+NEW / CREATIVE FEATURES:
+  - Progress bar showing % of tasks completed
+  - Overdue indicator: tasks past due date are highlighted in red
+  - "Today" badge: tasks due today get a special badge
+  - Dark mode toggle (light / dark theme)
+  - Confetti animation when ALL tasks are completed
+  - Task counter per priority in the header (e.g. 2 High, 1 Low)
+  - Sort options: by priority, by due date, by creation date
+  - Empty state illustration with motivational message
+
+----------------------------------------------------------------
+2. MAIN USER FLOWS (Step-by-Step)
+----------------------------------------------------------------
+
+FLOW 1 — Add a Task:
+  1. User types task title in the input field
+  2. User selects priority from dropdown (default: Medium)
+  3. User optionally picks a due date
+  4. User clicks "Add" button or presses Enter
+  5. Task appears at top of the list with priority badge and due date
+  6. Progress bar updates
+
+FLOW 2 — Complete a Task:
+  1. User checks the checkbox next to a task
+  2. Task text gets strikethrough styling
+  3. Task moves to "done" state
+  4. Progress bar updates
+  5. If all tasks are done → confetti animation plays
+
+FLOW 3 — Edit a Task:
+  1. User double-clicks on the task text
+  2. Text becomes an editable input field
+  3. User types new title
+  4. User presses Enter or clicks outside to save
+  5. User presses Escape to cancel (reverts to original)
+
+FLOW 4 — Delete a Task:
+  1. User clicks the X button on a task
+  2. Task is removed immediately
+  3. Progress bar updates
+
+FLOW 5 — Search Tasks:
+  1. User types in the search bar
+  2. List filters live to show only matching tasks
+  3. Clearing the search shows all tasks again
+
+FLOW 6 — Toggle Dark Mode:
+  1. User clicks the moon/sun icon in the header
+  2. App switches between light and dark theme instantly
+  3. Preference saved in localStorage
+
+FLOW 7 — Sort Tasks:
+  1. User selects a sort option from the sort dropdown
+  2. List reorders accordingly without losing any tasks
+
+----------------------------------------------------------------
+3. SYSTEM ARCHITECTURE
+----------------------------------------------------------------
+
+Type:         Pure Frontend (Single HTML file)
+Language:     HTML5, CSS3, Vanilla JavaScript (ES6+)
+Storage:      Browser localStorage (no backend, no database)
+Deployment:   Static file — open index.html in any browser
+              or host on GitHub Pages
+
+Data Model (stored as JSON in localStorage):
+  todos = [
+    {
+      id:        number   (timestamp, unique)
+      text:      string   (task title)
+      done:      boolean  (completion state)
+      priority:  string   ("high" | "medium" | "low")
+      dueDate:   string   (ISO date string, optional)
+      createdAt: number   (timestamp)
+    }
+  ]
+
+  settings = {
+    darkMode:  boolean
+    sortBy:    string ("created" | "priority" | "dueDate")
+  }
+
+----------------------------------------------------------------
+4. UI LAYOUT — SCREENS, COMPONENTS, BUTTONS, INPUTS & STYLE
+----------------------------------------------------------------
+
+SCREEN: Main (only screen)
+  ┌────────────────────────────────────┐
+  │  HEADER                            │
+  │  Title: "My Tasks"                 │
+  │  Progress bar (0–100%)             │
+  │  Stats: X remaining | Y done       │
+  │  Priority counters + Dark mode btn │
+  ├────────────────────────────────────┤
+  │  SEARCH BAR                        │
+  │  [🔍 Search tasks...]              │
+  ├────────────────────────────────────┤
+  │  INPUT AREA                        │
+  │  [Task title input]                │
+  │  [Priority dropdown] [Date picker] │
+  │  [+ Add button]                    │
+  ├────────────────────────────────────┤
+  │  CONTROLS                          │
+  │  Filter buttons: All/Active/Done/  │
+  │                  High/Medium/Low   │
+  │  Sort dropdown: Created/Priority/  │
+  │                 Due Date           │
+  ├────────────────────────────────────┤
+  │  TASK LIST                         │
+  │  ┌──────────────────────────────┐  │
+  │  │ ☐ [Task text]   [badge][date]│  │
+  │  │   ← colored left border     │  │
+  │  │                          [X] │  │
+  │  └──────────────────────────────┘  │
+  ├────────────────────────────────────┤
+  │  FOOTER                            │
+  │  X total  |  [Clear completed]     │
+  └────────────────────────────────────┘
+
+COMPONENTS:
+  - Header:         h1 title, progress bar, stats, dark mode toggle
+  - Search bar:     text input with icon, live filtering
+  - Input area:     text input + priority select + date input + add button
+  - Filter bar:     pill buttons (All, Active, Done, High, Medium, Low)
+  - Sort dropdown:  select element (Created, Priority, Due Date)
+  - Task item:      checkbox, text, priority badge, due date, delete button
+  - Empty state:    icon + motivational text when list is empty
+  - Footer:         task count + clear completed button
+
+INPUTS:
+  - Task title:     text input, maxlength=200, required
+  - Priority:       <select> with options High / Medium / Low
+  - Due date:       <input type="date">, optional
+  - Search:         text input, live onChange filtering
+  - Sort:           <select> with 3 options
+
+BUTTONS:
+  - Add:            primary (indigo), submits new task
+  - Delete (X):     ghost, red on hover
+  - Clear completed:text button, red color
+  - Dark mode:      icon toggle (moon/sun)
+  - Filter pills:   outline → filled when active
+
+STYLE:
+  Light theme:
+    Background:     #f0f2f5
+    Card:           #ffffff
+    Primary color:  #4f46e5 (indigo)
+    High priority:  #ef4444 (red)
+    Medium:         #f59e0b (amber)
+    Low:            #22c55e (green)
+    Text:           #111827
+    Muted text:     #9ca3af
+
+  Dark theme:
+    Background:     #111827
+    Card:           #1f2937
+    Primary color:  #6366f1
+    Text:           #f9fafb
+    Muted text:     #6b7280
+
+  Typography:       'Segoe UI', sans-serif
+  Border radius:    8px (inputs), 12px (card), 20px (pills)
+  Responsive:       max-width 480px, centered, mobile-friendly
+
+----------------------------------------------------------------
+5. EXCEPTIONS / ERROR STATES & HOW TO HANDLE THEM
+----------------------------------------------------------------
+
+  ERROR                         HANDLING
+  ─────────────────────────     ─────────────────────────────────
+  Empty task title submitted    Show red border on input + shake
+                                animation. Do NOT add the task.
+
+  Task title too long (>200)    HTML maxlength prevents typing
+                                beyond 200 characters.
+
+  localStorage unavailable      Catch error silently, app works
+                                in memory for the session only.
+                                Show small warning in footer.
+
+  Invalid/corrupt localStorage  JSON.parse wrapped in try/catch.
+                                Reset to empty array if corrupt.
+
+  Due date in the past          Allow it, but flag as overdue
+                                with red text and warning icon.
+
+  All tasks deleted             Show empty state with message:
+                                "No tasks yet. Add one above!"
+
+  Double-click edit on done     Allow editing, keep done state.
+  task
+
+  Very long task text           Text wraps, layout stays intact.
+                                No truncation — show full text.
+
+----------------------------------------------------------------
+6. SUCCESS CRITERIA (What is "Working Correctly")
+----------------------------------------------------------------
+
+  ✓ User can add a task with title, priority, and optional due date
+  ✓ Task appears immediately in the list after adding
+  ✓ Checkbox toggles task between done / not done
+  ✓ Strikethrough applied to completed tasks
+  ✓ Progress bar reflects correct % at all times
+  ✓ Delete removes the correct task
+  ✓ Edit saves new text correctly on Enter / blur
+  ✓ Edit cancels correctly on Escape
+  ✓ Filter shows only the correct subset of tasks
+  ✓ Search filters list live as user types
+  ✓ Sort reorders list correctly for each option
+  ✓ Dark mode toggles and persists after page refresh
+  ✓ All tasks + settings survive page refresh (localStorage)
+  ✓ Overdue tasks are visually flagged
+  ✓ Confetti plays only when all tasks are completed
+  ✓ Empty state shows when no tasks exist
+  ✓ App is usable on mobile screen sizes
+  ✓ No crashes on corrupt or missing localStorage data
+
+----------------------------------------------------------------
+7. TEST CASES
+----------------------------------------------------------------
+
+TYPICAL SCENARIOS:
+  TC-01  Add a task with title "Buy groceries", priority High,
+         due date tomorrow → task appears with red border and badge
+
+  TC-02  Check the task checkbox → text gets strikethrough,
+         progress bar increases
+
+  TC-03  Filter by "High" → only high priority tasks shown
+
+  TC-04  Type "buy" in search → only tasks containing "buy" shown
+
+  TC-05  Double-click task text → input appears with current text,
+         type new text, press Enter → text updates
+
+  TC-06  Click X on a task → task removed, progress bar updates
+
+  TC-07  Click dark mode toggle → theme switches to dark,
+         refresh page → dark mode still active
+
+  TC-08  Sort by "Due Date" → tasks ordered earliest to latest
+
+  TC-09  Click "Clear completed" → all done tasks removed
+
+  TC-10  Add 3 tasks, complete all 3 → confetti animation plays
+
+EDGE CASES:
+  TC-11  Click "Add" with empty input → nothing added,
+         input shakes with red border
+
+  TC-12  Add task with 200-character title → adds successfully,
+         text wraps in the list item
+
+  TC-13  Add a task with a due date of yesterday → task shows
+         overdue indicator in red
+
+  TC-14  Add task, refresh page → task still exists
+
+  TC-15  Press Escape during edit → task text reverts to original
+
+  TC-16  Filter "Done" with no completed tasks → empty state shown
+
+  TC-17  Search for text that matches nothing → empty state shown
+
+  TC-18  Manually corrupt localStorage value → app loads with
+         empty list, no crash
+
+  TC-19  Add task with only spaces as title → treated as empty,
+         not added (trim whitespace)
+
+  TC-20  Complete the only task in the list → progress bar = 100%,
+         confetti plays
+
+----------------------------------------------------------------
+END OF SPECIFICATION
+================================================================
